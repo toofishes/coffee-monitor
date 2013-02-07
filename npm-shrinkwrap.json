@@ -106,8 +106,19 @@
         }
       }
     },
-    "ejs": {
-      "version": "0.8.3"
+    "jade": {
+      "version": "0.28.1",
+      "dependencies": {
+        "commander": {
+          "version": "0.6.1"
+        },
+        "mkdirp": {
+          "version": "0.3.4"
+        },
+        "coffee-script": {
+          "version": "1.4.0"
+        }
+      }
     },
     "stylus": {
       "version": "0.32.0",
