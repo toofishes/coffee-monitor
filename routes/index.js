@@ -1,8 +1,5 @@
-
-/*
- * GET home page.
- */
-
 exports.index = function(req, res){
-  res.render('index', { title: 'Express' });
+  req.manager.getRecentBrews(function(error, brews){
+    res.render('index', { 'title': 'Recent Brews', 'brews': brews });
+  });
 };

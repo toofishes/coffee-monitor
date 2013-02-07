@@ -22,10 +22,12 @@ are as follows:
   - name: 'brews'
   - type: sorted set by time of brew
   - format: '%brewId%|%makerId%|%potId%'
+  - Note: we also add sets for each pot and maker, with names
+    'maker:%id%:brews', 'pot:%id%:brews', etc.
 * Brews
   - name: 'brew:%id%'
   - type: hash
-  - attributes: id, created, creationIp, makerId, potId
+  - attributes: id, createdAt, creationIp, makerId, potId
 * Other one-off config values:
   - 'nextMakerId', integer
   - 'nextPotId', integer

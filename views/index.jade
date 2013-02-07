@@ -2,4 +2,29 @@ extends layout
 
 block content
   h1= title
-  p Welcome to #{title}
+  #brews
+    - each brew in brews
+      .brew(id='brew-#{brew.id}', class="pot-red", data-created=brew.createdAt)
+        | Maker
+        span.maker-id #{brew.makerId}
+        br/
+        | Pot
+        span.pot-id #{brew.potId}
+
+  script
+    function computeOpacity(time) {
+      // returns diff in milliseconds
+      var diff = moment().diff(moment(time));
+      // scale according to how old; older than 2h gets minimum 10% opacity
+      var maxAge = 1000 * 60 * 60 * 2;
+      var ratio = (maxAge - diff) / maxAge;
+      return ratio < 0.1 ? 0.1 : ratio;
+    }
+    $('.brew').each(function(idx, ele) {
+      var unixTime = parseInt($(ele).data('created'));
+      var text = '';
+      text += moment(unixTime).calendar();
+      text += ' (' + moment(unixTime).fromNow() + ')';
+      $(ele).append('<p>' + text + '</p>');
+      $(ele).css('opacity', computeOpacity(unixTime));
+    });
