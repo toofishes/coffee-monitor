@@ -18,7 +18,8 @@ block content
       // scale according to how old; older than 2h gets minimum 10% opacity
       var maxAge = 1000 * 60 * 60 * 2;
       var ratio = (maxAge - diff) / maxAge;
-      return ratio < 0.1 ? 0.1 : ratio;
+      ratio = ratio < 0.0 ? 0.0 : ratio;
+      return (0.8 * ratio) + 0.2;
     }
     $('.brew').each(function(idx, ele) {
       var unixTime = parseInt($(ele).data('created'));
