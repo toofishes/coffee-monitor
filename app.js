@@ -3,12 +3,12 @@ var express = require('express'),
     http = require('http'),
     path = require('path'),
     redis = require('redis'),
+    socketIo = require('socket.io'),
     brewmanager = require('./brewmanager-redis');
 
 var db = redis.createClient();
 db.select(6);
 
-var app = express();
 var manager = new brewmanager.BrewManager();
 
 function setupBrewManager(req, res, next) {
@@ -20,6 +20,7 @@ function ipTracker(req, res, next) {
   db.zadd('online', Date.now(), req.ip, next);
 }
 
+var app = express();
 app.configure(function() {
   app.set('port', process.env.PORT || 3000);
   app.set('views', __dirname + '/views');
@@ -41,6 +42,23 @@ app.configure('development', function() {
 
 app.get('/', routes.index);
 
-http.createServer(app).listen(app.get('port'), function() {
+var server = http.createServer(app);
+server.listen(app.get('port'), function() {
   console.log("Express server listening on port " + app.get('port'));
+});
+
+var io = socketIo.listen(server);
+io.configure(function() {
+  // TODO: eventually store client data in Redis
+  // https://github.com/LearnBoost/Socket.IO/wiki/Configuring-Socket.IO
+  io.set('log level', 2);
+});
+io.sockets.on('connection', function(socket) {
+  manager.getRecentBrews(function(err, brews) {
+    app.render('single_brew', {brew: brews[0]}, function(err, html) {
+      console.log(err);
+      console.log(html);
+      socket.emit('news', html);
+    });
+  });
 });

@@ -11,6 +11,7 @@ block content
         | Pot
         span.pot-id #{brew.potId}
 
+  script(src='/socket.io/socket.io.js')
   script
     function computeOpacity(time) {
       // returns diff in milliseconds
@@ -28,4 +29,9 @@ block content
       text += ' (' + moment(unixTime).fromNow() + ')';
       $(ele).append('<p>' + text + '</p>');
       $(ele).css('opacity', computeOpacity(unixTime));
+    });
+
+    var socket = io.connect('');
+    socket.on('news', function(data) {
+      console.log(data);
     });
