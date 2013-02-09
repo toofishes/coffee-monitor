@@ -8,7 +8,10 @@ BrewManager.prototype.pots = [];
 BrewManager.prototype.brews = [];
 
 BrewManager.prototype.getRecentBrews = function(next) {
-  next(null, this.brews.slice(-5).reverse());
+  var recent = this.brews.slice(-5).reverse();
+  process.nextTick(function() {
+    next(null, recent);
+  });
 };
 
 function setBasicFields(obj, idSeq) {

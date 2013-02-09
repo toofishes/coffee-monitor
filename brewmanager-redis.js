@@ -1,11 +1,21 @@
-var redis = require('redis');
+var async = require('async'),
+    redis = require('redis');
+
 var db = redis.createClient();
 db.select(6);
 
 BrewManager = function(){};
 
 BrewManager.prototype.getRecentBrews = function(next) {
-  db.zrevrange('brews', 0, 5, next);
+  // first, get IDs of most recent brews
+  db.zrevrange('brews', 0, 4, function(err, brewIds) {
+    // with those IDs, retrieve the objects themselves as a list of maps
+    var m = db.multi();
+    brewIds.forEach(function(id, idx) {
+      m.hgetall('brew:' + id);
+    });
+    m.exec(next);
+  });
 };
 
 function storePartTwo(err, obj, type, next) {
@@ -42,40 +52,48 @@ BrewManager.prototype.addPot = function(pot, next) {
 
 BrewManager.prototype.addBrew = function(brew, next) {
   storeAsHash(brew, 'brew', 'nextBrewId', function(err) {
-    /* TODO: use sorted sets w/ time for brews sets, not regular sets */
-    var now = Date.now();
+    var now = brew.createdAt;
     db.multi()
-      .sadd('maker:' + brew.makerId + ':brews', brew.makerId)
-      .sadd('pot:' + brew.potId + ':brews', brew.potId)
-      .sadd('brews', brew.id)
+      .zadd('maker:' + brew.makerId + ':brews', now, brew.id)
+      .zadd('pot:' + brew.potId + ':brews', now, brew.id)
+      .zadd('brews', now, brew.id)
       .exec();
   });
 };
 
-/* now bootstrap some dummy data */
-var manager = new BrewManager();
-manager.addMaker({'name': 'Sample Coffee Maker', 'brewTime': 270, 'createdAt': 1358213907000},
-    function(error, maker){});
-manager.addPot({'name': 'Carafe A', 'color': 'green', 'createdAt': 1359213907000},
-    function(error, pot){});
-manager.addPot({'name': 'Carafe B', 'color': 'red', 'createdAt': 1360213907000},
-    function(error, pot){});
-
-/* TODO: first time this is ran, the above commands haven't actually run yet,
- * so we don't have any pots or coffee makers in existence. we need to ensure
- * things are ran callback-style so objects actually exist. */
-for (var i = 0; i < 50; i++) {
-  brew = {
-    'creationIp': '127.0.0.1',
-    'createdAt': Date.now() - (24 * 60 * 60 * 1000) + ((i + 1) / (50/24) * 60 * 60 * 1000)
-  };
-  db.multi()
-    .srandmember('makers', function(err, val) { brew.makerId = val; })
-    .srandmember('pots', function(err, val) { brew.potId = val; })
-    .exec(function(err, replies) {
-      console.log("loop exec", brew);
-      manager.addBrew(brew, function(error, brew){});
-    });
-}
-
 exports.BrewManager = BrewManager;
+
+exports.createDummyBrewData = function() {
+  var manager = new BrewManager();
+
+  function createBrews(howmany) {
+    for (var i = 0; i < howmany; i++) {
+      (function(i) {
+        var brew = {
+          'creationIp': '127.0.0.1',
+        'createdAt': Date.now() - (24 * 60 * 60 * 1000) + ((i + 1) / (50/24) * 60 * 60 * 1000)
+        };
+        db.multi()
+        .srandmember('makers', function(err, val) { brew.makerId = val; })
+        .srandmember('pots', function(err, val) { brew.potId = val; })
+        .exec(function(err, replies) {
+          manager.addBrew(brew, function(error, brew){});
+        });
+      })(i);
+    }
+  }
+
+  async.parallel([
+    function(next) {
+      manager.addMaker({'name': 'Sample Coffee Maker', 'brewTime': 270, 'createdAt': 1358213907000}, next);
+    },
+    function(next) {
+      manager.addPot({'name': 'Carafe A', 'color': 'green', 'createdAt': 1359213907000}, next);
+    },
+    function(next) {
+      manager.addPot({'name': 'Carafe B', 'color': 'red', 'createdAt': 1360213907000}, next);
+    }
+  ], function(err) {
+    createBrews(50);
+  });
+};
