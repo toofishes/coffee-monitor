@@ -10,14 +10,14 @@ are as follows:
 * Coffee makers
   - name: 'maker:%id%'
   - type: hash
-  - attributes: id, name, model, brewTime (seconds), potsBrewed
+  - attributes: id, name, model, brewTime (seconds)
 * Coffee pot set
   - name: 'pots'
   - type: set
 * Coffee pots
   - name: 'pot:%id%'
   - type: hash
-  - attributes: id, name, color, timesUsed
+  - attributes: id, name, color
 * Brews set
   - name: 'brews'
   - type: sorted set by time of brew
