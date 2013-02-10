@@ -2,16 +2,10 @@ var express = require('express'),
     routes = require('./routes'),
     http = require('http'),
     path = require('path'),
-    redis = require('redis'),
+    redisHelper = require('./helpers/redis'),
     brewmanager = require('./brewmanager-redis');
 
-function redisConnection() {
-  var db = redis.createClient();
-  db.select(6, function (err) { if (err) throw err; });
-  return db;
-}
-
-var db = redisConnection();
+var db = redisHelper.getConnection();
 var manager = new brewmanager.BrewManager();
 
 function attachBrewManager(req, res, next) {
@@ -52,14 +46,14 @@ server.listen(app.get('port'), function() {
 var io = require('socket.io').listen(server);
 io.configure(function() {
   io.set('log level', 2);
-  // This uses redis for pubsub as well as storing any client data there
+  // This uses Redis for pubsub as well as storing any client data there
   // rather than in memory. Nice because it then persists across restarts.
   var RedisStore = require('socket.io/lib/stores/redis');
   io.set('store', new RedisStore({
-    redis: redis,
-    redisPub: redisConnection(),
-    redisSub: redisConnection(),
-    redisClient: redisConnection()
+    redis: redisHelper.redis,
+    redisPub: redisHelper.getConnection(),
+    redisSub: redisHelper.getConnection(),
+    redisClient: redisHelper.getConnection()
   }));
 });
 io.sockets.on('connection', function(socket) {

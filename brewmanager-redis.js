@@ -1,8 +1,7 @@
 var async = require('async'),
-    redis = require('redis');
+    redisHelper = require('./helpers/redis');
 
-var db = redis.createClient();
-db.select(6);
+var db = redisHelper.getConnection();
 
 BrewManager = function(){};
 
