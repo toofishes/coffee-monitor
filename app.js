@@ -3,20 +3,23 @@ var express = require('express'),
     http = require('http'),
     path = require('path'),
     redis = require('redis'),
-    socketIo = require('socket.io'),
     brewmanager = require('./brewmanager-redis');
 
-var db = redis.createClient();
-db.select(6);
+function redisConnection() {
+  var db = redis.createClient();
+  db.select(6, function (err) { if (err) throw err; });
+  return db;
+}
 
+var db = redisConnection();
 var manager = new brewmanager.BrewManager();
 
-function setupBrewManager(req, res, next) {
+function attachBrewManager(req, res, next) {
   req.manager = manager;
   next();
 }
 
-function ipTracker(req, res, next) {
+function onlineTracker(req, res, next) {
   db.zadd('online', Date.now(), req.ip, next);
 }
 
@@ -29,8 +32,7 @@ app.configure(function() {
   app.use(express.logger('dev'));
   app.use(express.bodyParser());
   app.use(express.methodOverride());
-  app.use(ipTracker);
-  app.use(setupBrewManager);
+  app.use(attachBrewManager);
   app.use(app.router);
   app.use(require('stylus').middleware(__dirname + '/public'));
   app.use(express.static(path.join(__dirname, 'public')));
@@ -40,24 +42,29 @@ app.configure('development', function() {
   app.use(express.errorHandler());
 });
 
-app.get('/', routes.index);
+app.get('/', onlineTracker, routes.index);
 
 var server = http.createServer(app);
 server.listen(app.get('port'), function() {
   console.log("Express server listening on port " + app.get('port'));
 });
 
-var io = socketIo.listen(server);
+var io = require('socket.io').listen(server);
 io.configure(function() {
-  // TODO: eventually store client data in Redis
-  // https://github.com/LearnBoost/Socket.IO/wiki/Configuring-Socket.IO
   io.set('log level', 2);
+  // This uses redis for pubsub as well as storing any client data there
+  // rather than in memory. Nice because it then persists across restarts.
+  var RedisStore = require('socket.io/lib/stores/redis');
+  io.set('store', new RedisStore({
+    redis: redis,
+    redisPub: redisConnection(),
+    redisSub: redisConnection(),
+    redisClient: redisConnection()
+  }));
 });
 io.sockets.on('connection', function(socket) {
   manager.getRecentBrews(function(err, brews) {
     app.render('single_brew', {brew: brews[0]}, function(err, html) {
-      console.log(err);
-      console.log(html);
       socket.emit('news', html);
     });
   });
