@@ -29,7 +29,8 @@ app.configure(function() {
   app.set('port', process.env.PORT || 3000);
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
-  app.use(express.favicon());
+  app.use(express.favicon(__dirname + '/public/favicon.ico',
+		  { maxAge: 365 * 24 * 60 * 60 * 1000 }));
   app.use(express.logger('dev'));
   app.use(express.compress({ filter: compressFilter }));
   app.use(express.bodyParser());
