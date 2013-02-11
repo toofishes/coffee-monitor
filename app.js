@@ -36,7 +36,15 @@ app.configure('development', function() {
   app.use(express.errorHandler());
 });
 
-app.get('/', onlineTracker, routes.index);
+// Start defining routes
+app.get('/', onlineTracker, routes.recentBrews);
+app.get('/makers/:id', onlineTracker, routes.makerDetail);
+app.get('/makers', onlineTracker, routes.makers);
+app.get('/pots/:id', onlineTracker, routes.potDetail);
+app.get('/pots', onlineTracker, routes.pots);
+app.get('/brews/:id', onlineTracker, routes.brewDetail);
+app.get('/brews', onlineTracker, routes.brews);
+
 
 var server = http.createServer(app);
 server.listen(app.get('port'), function() {
