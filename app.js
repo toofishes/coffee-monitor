@@ -64,9 +64,10 @@ io.configure(function() {
     redisClient: redisHelper.getConnection()
   }));
 });
+
 io.sockets.on('connection', function(socket) {
   manager.getRecentBrews(function(err, brews) {
-    app.render('single_brew', {brew: brews[0]}, function(err, html) {
+    app.render('includes/brew-single', {brew: brews[0]}, function(err, html) {
       socket.emit('news', html);
     });
   });

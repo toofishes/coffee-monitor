@@ -49,6 +49,10 @@ BrewManager.prototype.addPot = function(pot, next) {
   });
 };
 
+BrewManager.prototype.getBrew = function(id, next) {
+  db.hgetall('brew:' + id, next);
+};
+
 BrewManager.prototype.addBrew = function(brew, next) {
   storeAsHash(brew, 'brew', 'nextBrewId', function(err) {
     var now = brew.createdAt;

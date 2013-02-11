@@ -4,12 +4,7 @@ block content
   h1= title
   #brews
     - each brew in brews
-      .brew(id='brew-#{brew.id}', class="pot-red", data-created=brew.createdAt)
-        | Maker
-        span.maker-id #{brew.makerId}
-        br/
-        | Pot
-        span.pot-id #{brew.potId}
+      include includes/brew-single
 
   script(src='/socket.io/socket.io.js')
   script
