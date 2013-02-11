@@ -15,6 +15,9 @@ block content
       var maxAge = 1000 * 60 * 60 * 2;
       var ratio = (maxAge - diff) / maxAge;
       ratio = ratio < 0.0 ? 0.0 : ratio;
+      if(isNaN(ratio) || ratio > 1.0) {
+        return 1.0;
+      }
       return (0.8 * ratio) + 0.2;
     }
     function setOpacity(ele) {
@@ -28,19 +31,25 @@ block content
         $(ele).find('.relative-time').html(moment(unixTime).fromNow());
       });
     }
-    refreshBrews();
-    window.setInterval(refreshBrews, 30000);
+
     var socket = io.connect();
+    socket.on('recentBrews', function(data) {
+      $('#brews').html(data);
+      refreshBrews();
+    });
     socket.on('updateBrew', function(data) {
       var id = $($.parseHTML(data)).attr('id');
-      var found = $('#brew-' + id);
+      var found = $('#' + id);
       if(found.length) {
         found.replaceWith(data);
       } else {
         $('#brews').prepend(data);
       }
-      setOpacity('#brew-' + id);
+      setOpacity('#' + id);
     });
     socket.on('deleteBrew', function(data) {
       $('#brew-' + data).remove();
     });
+
+    socket.emit('recentBrews');
+    window.setInterval(refreshBrews, 30000);

@@ -72,14 +72,18 @@ io.configure(function() {
   }));
 });
 
-io.sockets.on('connection', function(socket) { });
+io.sockets.on('connection', function(socket) {
+  socket.on('recentBrews', function() {
+    signals.recentBrews(app, socket, manager);
+  });
+});
 
 var ioSub = redisHelper.getConnection();
 ioSub.on('message', function(chan, msg) {
   if (chan === 'updateBrew') {
     signals.updateBrew(app, io, manager, msg);
   } else if (chan === 'deleteBrew') {
-    signals.deleteBrew(app, io, msg);
+    signals.deleteBrew(io, msg);
   }
 });
 ioSub.subscribe('updateBrew', 'deleteBrew');

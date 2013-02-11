@@ -64,28 +64,30 @@ version of a brew that was just created in the system, or one that was updated.
 This is broadcast to all currently connected clients. It contains just the ID
 of the brew that was deleted.
 
+#### recentBrews
+
+The server responds with a rendered version of the most recent brews we know
+about. This is the same as the contents of the '#brews' div.
+
 ### Emitted by client
-
-#### connection
-
-When a client first connects, this is a well-known event. The server responds
-with a rendered version of the five most recent brews we know about.
 
 #### recentBrews
 
-This does the same thing as the 'connection' event.
+Emit this event when you wish to get a list of recent brews sent your way.
 
 TODO List
 ---------
 
 * Track currently connected clients (by IP?)
-* Live updates via Socket.IO
 * Read-only view page
   - Large 'big-board' version
   - Normal desktop computer version
   - Mobile-friendly version
 * Simple "press when brewing" screen
 * Don't crash the whole server process on Redis errors (or callbacks passed in)
+* Utilize brew started vs. brew finished information
+* Timing issues if host vs. client clocks differ (don't ever trust Date.now()
+  in client?)
 * Configurable:
   - coffee maker inventory and info- name, model, time to brew, size?, etc.
   - carafe inventory- size?, color marker, etc.

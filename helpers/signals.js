@@ -1,3 +1,15 @@
+var async = require('async');
+
+exports.recentBrews = function(app, socket, manager) {
+  manager.getRecentBrews(function(err, brews) {
+    async.map(brews, function(brew, next) {
+      app.render('includes/brew-single', {brew: brew}, next);
+    }, function(err, results) {
+      socket.emit('recentBrews', results.join(''));
+    });
+  });
+};
+
 exports.updateBrew = function(app, io, manager, brewId) {
   // TODO: there has to be a better way of getting all this darn state
   // and global stuff into here.
@@ -8,6 +20,6 @@ exports.updateBrew = function(app, io, manager, brewId) {
   });
 };
 
-exports.deleteBrew = function(app, io, brewId) {
+exports.deleteBrew = function(io, brewId) {
   io.sockets.emit('deleteBrew', brewId);
 };
