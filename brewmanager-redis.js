@@ -60,7 +60,18 @@ BrewManager.prototype.addBrew = function(brew, next) {
       .zadd('maker:' + brew.makerId + ':brews', now, brew.id)
       .zadd('pot:' + brew.potId + ':brews', now, brew.id)
       .zadd('brews', now, brew.id)
-      .exec();
+      .exec(next);
+  });
+};
+
+BrewManager.prototype.removeBrew = function(id, next) {
+  this.getBrew(id, function(err, brew) {
+    db.multi()
+    .del('brew:' + id)
+    .zrem('maker:' + brew.makerId + ':brews', brew.id)
+    .zrem('pot:' + brew.potId + ':brews', brew.id)
+    .zrem('brews', id)
+    .exec(next);
   });
 };
 
