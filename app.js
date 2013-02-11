@@ -73,6 +73,7 @@ io.configure(function() {
 });
 
 io.sockets.on('connection', function(socket) {
+  signals.recentBrews(app, socket, manager);
   socket.on('recentBrews', function() {
     signals.recentBrews(app, socket, manager);
   });
