@@ -19,10 +19,6 @@ block content
     }
     $('.brew').each(function(idx, ele) {
       var unixTime = parseInt($(ele).data('created'));
-      var text = '';
-      text += moment(unixTime).calendar();
-      text += ' (' + moment(unixTime).fromNow() + ')';
-      $(ele).append('<p>' + text + '</p>');
       $(ele).css('opacity', computeOpacity(unixTime));
     });
 

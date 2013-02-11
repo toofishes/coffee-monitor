@@ -18,6 +18,7 @@ function onlineTracker(req, res, next) {
 }
 
 var app = express();
+app.locals.moment = require('moment');
 app.configure(function() {
   app.set('port', process.env.PORT || 3000);
   app.set('views', __dirname + '/views');
