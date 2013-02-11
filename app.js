@@ -1,4 +1,5 @@
 var express = require('express'),
+    expressValidator = require('express-validator'),
     routes = require('./routes'),
     http = require('http'),
     path = require('path'),
@@ -26,6 +27,7 @@ app.configure(function() {
   app.use(express.favicon());
   app.use(express.logger('dev'));
   app.use(express.bodyParser());
+  app.use(expressValidator);
   app.use(express.methodOverride());
   app.use(attachBrewManager);
   app.use(app.router);
@@ -43,10 +45,11 @@ app.get('/makers/:id', onlineTracker, routes.makerDetail);
 app.get('/makers', onlineTracker, routes.makers);
 app.get('/pots/:id', onlineTracker, routes.potDetail);
 app.get('/pots', onlineTracker, routes.pots);
+app.get('/brews/add', routes.brewAdd);
+app.post('/brews/add', routes.brewAddSubmit);
 app.get('/brews/:id', onlineTracker, routes.brewDetail);
 app.delete('/brews/:id', routes.brewDelete);
 app.get('/brews', onlineTracker, routes.brews);
-app.post('/brews', routes.brewAdd);
 
 
 var server = http.createServer(app);

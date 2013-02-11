@@ -37,9 +37,29 @@ function storeAsHash(obj, type, seqName, next) {
   }
 }
 
+BrewManager.prototype.getMakers = function(next) {
+  db.smembers('makers', function(err, ids) {
+    var m = db.multi();
+    ids.forEach(function(id, idx) {
+      m.hgetall('maker:' + id);
+    });
+    m.exec(next);
+  });
+};
+
 BrewManager.prototype.addMaker = function(maker, next) {
   storeAsHash(maker, 'maker', 'nextMakerId', function(err) {
     db.sadd('makers', maker.id, next);
+  });
+};
+
+BrewManager.prototype.getPots = function(next) {
+  db.smembers('pots', function(err, ids) {
+    var m = db.multi();
+    ids.forEach(function(id, idx) {
+      m.hgetall('pot:' + id);
+    });
+    m.exec(next);
   });
 };
 
@@ -88,8 +108,8 @@ exports.createDummyBrewData = function() {
     for (var i = 0; i < howmany; i++) {
       (function(i) {
         var brew = {
-          'creationIp': '127.0.0.1',
-        'createdAt': Date.now() - (24 * 60 * 60 * 1000) + ((i + 1) / (50/24) * 60 * 60 * 1000)
+          creationIp: '127.0.0.1',
+          createdAt: Date.now() - (24 * 60 * 60 * 1000) + ((i + 1) / (50/24) * 60 * 60 * 1000)
         };
         db.multi()
         .srandmember('makers', function(err, val) { brew.makerId = val; })
