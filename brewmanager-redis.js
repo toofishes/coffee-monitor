@@ -83,7 +83,6 @@ BrewManager.prototype.addBrew = function(brew, next) {
           .exec(next);
       },
       function(results, next) {
-        console.log(results);
         brew.makerName = results[0][0];
         brew.brewTime = results[0][1];
         brew.potName = results[1][0];
@@ -91,7 +90,6 @@ BrewManager.prototype.addBrew = function(brew, next) {
         next(null, brew);
       },
       function(brew, next) {
-        console.log(brew);
         storeAsHash(brew, 'brew', 'nextBrewId', next);
       },
       function() {
