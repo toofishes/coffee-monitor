@@ -31,7 +31,7 @@ exports.brewDetail = function(req, res) {
 };
 
 exports.brewDelete = function(req, res) {
-  req.manager.removeBrew(req.params.id, function(err) {
+  req.manager.deleteBrew(req.params.id, function(err) {
     res.send(204, null);
   });
 };

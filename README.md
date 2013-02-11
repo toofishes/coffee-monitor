@@ -54,18 +54,15 @@ events are utilized:
 
 ### Emitted by server
 
-#### createBrew
-
-This is broadcast to all currently connected clients. It contains a rendered
-version of a brew that was just created in the system.
-
 #### updateBrew
 
-Todo.
+This is broadcast to all currently connected clients. It contains a rendered
+version of a brew that was just created in the system, or one that was updated.
 
 #### deleteBrew
 
-Todo.
+This is broadcast to all currently connected clients. It contains just the ID
+of the brew that was deleted.
 
 ### Emitted by client
 

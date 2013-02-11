@@ -4,6 +4,7 @@ var express = require('express'),
     http = require('http'),
     path = require('path'),
     redisHelper = require('./helpers/redis'),
+    signals = require('./helpers/signals'),
     brewmanager = require('./brewmanager-redis');
 
 var db = redisHelper.getConnection();
@@ -71,10 +72,14 @@ io.configure(function() {
   }));
 });
 
-io.sockets.on('connection', function(socket) {
-  manager.getRecentBrews(function(err, brews) {
-    app.render('includes/brew-single', {brew: brews[0]}, function(err, html) {
-      socket.emit('news', html);
-    });
-  });
+io.sockets.on('connection', function(socket) { });
+
+var ioSub = redisHelper.getConnection();
+ioSub.on('message', function(chan, msg) {
+  if (chan === 'updateBrew') {
+    signals.updateBrew(app, io, manager, msg);
+  } else if (chan === 'deleteBrew') {
+    signals.deleteBrew(app, io, msg);
+  }
 });
+ioSub.subscribe('updateBrew', 'deleteBrew');

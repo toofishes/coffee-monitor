@@ -8,7 +8,7 @@ block content
 
   script(src='/socket.io/socket.io.js')
   script
-    function computeOpacity(time) {
+    function calculateOpacity(time) {
       // returns diff in milliseconds
       var diff = moment().diff(moment(time));
       // scale according to how old; older than 2h gets minimum 10% opacity
@@ -17,12 +17,30 @@ block content
       ratio = ratio < 0.0 ? 0.0 : ratio;
       return (0.8 * ratio) + 0.2;
     }
-    $('.brew').each(function(idx, ele) {
+    function setOpacity(ele) {
       var unixTime = parseInt($(ele).data('created'));
-      $(ele).css('opacity', computeOpacity(unixTime));
+      $(ele).css('opacity', calculateOpacity(unixTime));
+    }
+    function refreshBrews() {
+      $('.brew').each(function(idx, ele) {
+        setOpacity(ele);
+        var unixTime = parseInt($(ele).data('created'));
+        $(ele).find('.relative-time').html(moment(unixTime).fromNow());
+      });
+    }
+    refreshBrews();
+    window.setInterval(refreshBrews, 30000);
+    var socket = io.connect();
+    socket.on('updateBrew', function(data) {
+      var id = $($.parseHTML(data)).attr('id');
+      var found = $('#brew-' + id);
+      if(found.length) {
+        found.replaceWith(data);
+      } else {
+        $('#brews').prepend(data);
+      }
+      setOpacity('#brew-' + id);
     });
-
-    var socket = io.connect('');
-    socket.on('news', function(data) {
-      console.log(data);
+    socket.on('deleteBrew', function(data) {
+      $('#brew-' + data).remove();
     });

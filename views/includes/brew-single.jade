@@ -1,7 +1,11 @@
 .brew(id='brew-#{brew.id}', class="pot-red", data-created=brew.createdAt)
-  p Coffee maker 
+  p Brew 
+    span.brew-id #{brew.id}
+    , using coffee maker 
     span.maker-id #{brew.makerId}
     , using pot 
     span.pot-id #{brew.potId}
   - var unixTime = parseInt(brew.createdAt);
-  p #{moment(unixTime).calendar()} (#{moment(unixTime).fromNow()})
+  p #{moment(unixTime).calendar()} (
+    span.relative-time #{moment(unixTime).fromNow()}
+    )

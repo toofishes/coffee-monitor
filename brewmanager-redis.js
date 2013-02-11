@@ -80,11 +80,12 @@ BrewManager.prototype.addBrew = function(brew, next) {
       .zadd('maker:' + brew.makerId + ':brews', now, brew.id)
       .zadd('pot:' + brew.potId + ':brews', now, brew.id)
       .zadd('brews', now, brew.id)
+      .publish('updateBrew', brew.id)
       .exec(next);
   });
 };
 
-BrewManager.prototype.removeBrew = function(id, next) {
+BrewManager.prototype.deleteBrew = function(id, next) {
   this.getBrew(id, function(err, brew) {
     if(!brew) {
       next(null);
@@ -94,6 +95,7 @@ BrewManager.prototype.removeBrew = function(id, next) {
       .zrem('maker:' + brew.makerId + ':brews', brew.id)
       .zrem('pot:' + brew.potId + ':brews', brew.id)
       .zrem('brews', id)
+      .publish('deleteBrew', id)
       .exec(next);
     }
   });
