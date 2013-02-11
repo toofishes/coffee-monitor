@@ -88,6 +88,7 @@ TODO List
   - Normal desktop computer version
   - Mobile-friendly version
 * Simple "press when brewing" screen
+* Don't crash the whole server process on Redis errors (or callbacks passed in)
 * Configurable:
   - coffee maker inventory and info- name, model, time to brew, size?, etc.
   - carafe inventory- size?, color marker, etc.

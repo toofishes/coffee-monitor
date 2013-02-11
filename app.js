@@ -44,7 +44,9 @@ app.get('/makers', onlineTracker, routes.makers);
 app.get('/pots/:id', onlineTracker, routes.potDetail);
 app.get('/pots', onlineTracker, routes.pots);
 app.get('/brews/:id', onlineTracker, routes.brewDetail);
+app.delete('/brews/:id', routes.brewDelete);
 app.get('/brews', onlineTracker, routes.brews);
+app.post('/brews', routes.brewAdd);
 
 
 var server = http.createServer(app);
