@@ -92,7 +92,7 @@ BrewManager.prototype.addBrew = function(brew, next) {
       function(brew, next) {
         storeAsHash(brew, 'brew', 'nextBrewId', next);
       },
-      function() {
+      function(result, next) {
         var now = brew.createdAt;
         var ready = parseInt(now) + (1000 * parseInt(brew.brewTime));
         db.multi()
@@ -103,7 +103,9 @@ BrewManager.prototype.addBrew = function(brew, next) {
           .publish('updateBrew', brew.id)
           .exec(next);
       }
-  ], next);
+  ], function(err, results) {
+    next(null, brew);
+  });
 };
 
 BrewManager.prototype.deleteBrew = function(id, next) {

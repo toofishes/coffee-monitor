@@ -91,6 +91,7 @@ TODO List
 * Configurable:
   - coffee maker inventory and info- name, model, time to brew, size?, etc.
   - carafe inventory- size?, color marker, etc.
+* Switch away from Socket.IO; use https://github.com/einaros/ws
 
 Credits
 -------

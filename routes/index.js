@@ -68,7 +68,7 @@ exports.brewAddSubmit = function(req, res) {
   };
 
   req.manager.addBrew(brew, function(err, brew) {
-    res.redirect('/');
+    res.redirect('/brews/' + brew.id);
   });
 }
 
