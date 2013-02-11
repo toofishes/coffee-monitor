@@ -74,15 +74,37 @@ BrewManager.prototype.getBrew = function(id, next) {
 };
 
 BrewManager.prototype.addBrew = function(brew, next) {
-  storeAsHash(brew, 'brew', 'nextBrewId', function(err) {
-    var now = brew.createdAt;
-    db.multi()
-      .zadd('maker:' + brew.makerId + ':brews', now, brew.id)
-      .zadd('pot:' + brew.potId + ':brews', now, brew.id)
-      .zadd('brews', now, brew.id)
-      .publish('updateBrew', brew.id)
-      .exec(next);
-  });
+  async.waterfall([
+      function(next) {
+        db.multi()
+          .hmget('maker:' + brew.makerId, 'name', 'brewTime')
+          .hmget('pot:' + brew.potId, 'name', 'color')
+          .exec(next);
+      },
+      function(results, next) {
+        console.log(results);
+        brew.makerName = results[0][0];
+        brew.brewTime = results[0][1];
+        brew.potName = results[1][0];
+        brew.potColor = results[1][1];
+        next(null, brew);
+      },
+      function(brew, next) {
+        console.log(brew);
+        storeAsHash(brew, 'brew', 'nextBrewId', next);
+      },
+      function() {
+        var now = brew.createdAt;
+        var ready = parseInt(now) + (1000 * parseInt(brew.brewTime));
+        db.multi()
+          .hset('brew:' + brew.id, 'readyAt', ready)
+          .zadd('maker:' + brew.makerId + ':brews', now, brew.id)
+          .zadd('pot:' + brew.potId + ':brews', now, brew.id)
+          .zadd('brews', now, brew.id)
+          .publish('updateBrew', brew.id)
+          .exec(next);
+      }
+  ], next);
 };
 
 BrewManager.prototype.deleteBrew = function(id, next) {
