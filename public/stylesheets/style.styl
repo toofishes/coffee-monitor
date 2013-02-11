@@ -1,6 +1,16 @@
 body
   font-family "Helvetica Neue","Lucida Grande",Helvetica,Arial,sans-serif
 
+div.bgimage
+  position fixed
+  z-index -1
+  width 100%
+  height 95%
+  max-width 400px
+  background url("../images/coffee_mug.svg") center center no-repeat
+  background-size contain
+  opacity 0.3
+
 div.brew
   border-radius 8px
   padding 8px
@@ -9,16 +19,16 @@ div.brew
   text-shadow 0 1px 0 rgba(255, 255, 255, 0.5)
 
 .pot-green
-  background-color #DFF0D8
+  background-color rgba(223, 240, 216, 0.9)
   border-color #D6E9C6
   color #468847
 
 .pot-red
-  background-color #F2DEDE
+  background-color rgba(242, 222, 222, 0.9)
   border-color #EED3D7
   color #B94A48
 
 .pot-blue
-  background-color #D9EDF7
+  background-color rgba(217, 237, 247, 0.9)
   border-color #BCE8F1
   color #3A87AD
