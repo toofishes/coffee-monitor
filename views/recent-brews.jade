@@ -24,16 +24,22 @@ block content
       var created = parseInt($(ele).data('created'));
       $(ele).css('opacity', calculateOpacity(created));
     }
+    function setBrewing(ele) {
+      var ready = parseInt($(ele).data('ready'));
+      if(ready > Date.now()) {
+        $(ele).addClass('brewing');
+      } else {
+        $(ele).removeClass('brewing');
+      }
+    }
     function refreshBrews() {
       $('.brew').each(function(idx, ele) {
         setOpacity(ele);
+        setBrewing(ele);
         var created = parseInt($(ele).data('created'));
         $(ele).find('.created-relative').html(moment(created).fromNow());
         var ready = parseInt($(ele).data('ready'));
         $(ele).find('.ready-relative').html(moment(ready).fromNow());
-        if(ready > Date.now()) {
-          $(ele).addClass('brewing');
-        }
       });
     }
 
@@ -49,14 +55,12 @@ block content
       if(found.length) {
         found.replaceWith(data);
         setOpacity('#' + id);
+        setBrewing(ele);
       } else {
         $(parsed).hide();
         $('#brews').prepend(parsed);
         var ele = $('#' + id);
-        var ready = parseInt(ele.data('ready'));
-        if(ready > Date.now()) {
-          $(ele).addClass('brewing');
-        }
+        setBrewing(ele);
         var created = parseInt($(ele).data('created'));
         ele.fadeTo(1500, calculateOpacity(created));
       }

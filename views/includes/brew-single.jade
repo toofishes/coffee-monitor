@@ -1,4 +1,6 @@
-.brew(id='brew-#{brew.id}', class='pot-#{brew.potColor}',
+- var klass = 'pot-' + brew.potColor;
+- if(parseInt(brew.readyAt) > Date.now()) klass += ' brewing';
+.brew(id='brew-#{brew.id}', class=klass,
     data-created=brew.createdAt, data-ready=brew.readyAt)
   ul
     li Brew: #{brew.id}
