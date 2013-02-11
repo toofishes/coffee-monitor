@@ -69,6 +69,9 @@ of the brew that was deleted.
 The server responds with a rendered version of the most recent brews we know
 about. This is the same as the contents of the '#brews' div.
 
+This event is sent automatically when a client connects to make sure they have
+the most recent list of brews.
+
 ### Emitted by client
 
 #### recentBrews
@@ -92,6 +95,11 @@ TODO List
   - coffee maker inventory and info- name, model, time to brew, size?, etc.
   - carafe inventory- size?, color marker, etc.
 * Switch away from Socket.IO; use https://github.com/einaros/ws
+* Provide an RSS feed (https://github.com/dylang/node-rss)
+* Tweet brewed pots? (https://github.com/ttezel/twit)
+* Send emails to people that want them
+* Jabber IMs?
+* Post to Campfire (https://github.com/tristandunn/node-campfire)
 
 Credits
 -------
