@@ -62,6 +62,14 @@
         }
       }
     },
+    "express-validator": {
+      "version": "0.3.1",
+      "dependencies": {
+        "validator": {
+          "version": "0.4.19"
+        }
+      }
+    },
     "jade": {
       "version": "0.28.1",
       "dependencies": {
