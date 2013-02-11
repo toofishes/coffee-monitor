@@ -19,6 +19,10 @@ function onlineTracker(req, res, next) {
   db.zadd('online', Date.now(), req.ip, next);
 }
 
+function compressFilter(req, res) {
+  return /json|text|javascript|svg\+xml/.test(res.getHeader('Content-Type'));
+}
+
 var app = express();
 app.locals.moment = require('moment');
 app.configure(function() {
@@ -27,6 +31,7 @@ app.configure(function() {
   app.set('view engine', 'jade');
   app.use(express.favicon());
   app.use(express.logger('dev'));
+  app.use(express.compress({ filter: compressFilter }));
   app.use(express.bodyParser());
   app.use(expressValidator);
   app.use(express.methodOverride());
@@ -60,7 +65,10 @@ server.listen(app.get('port'), function() {
 
 var io = require('socket.io').listen(server);
 io.configure(function() {
-  io.set('log level', 2);
+  io.set('log level', 1);
+  io.set('browser client etag', true);
+  io.set('browser client gzip', true);
+  io.set('browser client minification', true);
   // This uses Redis for pubsub as well as storing any client data there
   // rather than in memory. Nice because it then persists across restarts.
   var RedisStore = require('socket.io/lib/stores/redis');
