@@ -21,14 +21,16 @@ block content
       return (0.8 * ratio) + 0.2;
     }
     function setOpacity(ele) {
-      var unixTime = parseInt($(ele).data('created'));
-      $(ele).css('opacity', calculateOpacity(unixTime));
+      var created = parseInt($(ele).data('created'));
+      $(ele).css('opacity', calculateOpacity(created));
     }
     function refreshBrews() {
       $('.brew').each(function(idx, ele) {
         setOpacity(ele);
-        var unixTime = parseInt($(ele).data('created'));
-        $(ele).find('.relative-time').html(moment(unixTime).fromNow());
+        var created = parseInt($(ele).data('created'));
+        $(ele).find('.created-relative').html(moment(created).fromNow());
+        var ready = parseInt($(ele).data('ready'));
+        $(ele).find('.ready-relative').html(moment(ready).fromNow());
       });
     }
 
@@ -48,8 +50,8 @@ block content
         $(parsed).hide();
         $('#brews').prepend(parsed);
         var ele = $('#' + id);
-        var unixTime = parseInt($(ele).data('created'));
-        ele.fadeTo(1500, calculateOpacity(unixTime));
+        var created = parseInt($(ele).data('created'));
+        ele.fadeTo(1500, calculateOpacity(created));
       }
     });
     socket.on('deleteBrew', function(data) {
