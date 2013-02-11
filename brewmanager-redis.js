@@ -6,8 +6,9 @@ var db = redisHelper.getConnection();
 BrewManager = function(){};
 
 BrewManager.prototype.getRecentBrews = function(next) {
-  // first, get IDs of most recent brews
-  db.zrevrange('brews', 0, 4, function(err, brewIds) {
+  // first, get IDs of most recent brews- 8 hour cutoff
+  var cutoff = Date.now() - (8 * 60 * 60 * 1000);
+  db.zrevrangebyscore('brews', '+inf', cutoff, function(err, brewIds) {
     // with those IDs, retrieve the objects themselves as a list of maps
     var m = db.multi();
     brewIds.forEach(function(id, idx) {
