@@ -38,17 +38,23 @@ block content
       refreshBrews();
     });
     socket.on('updateBrew', function(data) {
-      var id = $($.parseHTML(data)).attr('id');
+      var parsed = $.parseHTML(data);
+      var id = $(parsed).attr('id');
       var found = $('#' + id);
       if(found.length) {
         found.replaceWith(data);
+        setOpacity('#' + id);
       } else {
-        $('#brews').prepend(data);
+        $(parsed).hide();
+        $('#brews').prepend(parsed);
+        var ele = $('#' + id);
+        var unixTime = parseInt($(ele).data('created'));
+        ele.fadeTo(1500, calculateOpacity(unixTime));
       }
-      setOpacity('#' + id);
     });
     socket.on('deleteBrew', function(data) {
-      $('#brew-' + data).remove();
+      var brew = $('#brew-' + data);
+      brew.fadeOut(1000, function() { brew.remove() });
     });
 
     socket.emit('recentBrews');
