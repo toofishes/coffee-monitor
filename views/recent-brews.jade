@@ -31,6 +31,9 @@ block content
         $(ele).find('.created-relative').html(moment(created).fromNow());
         var ready = parseInt($(ele).data('ready'));
         $(ele).find('.ready-relative').html(moment(ready).fromNow());
+        if(ready > Date.now()) {
+          $(ele).addClass('brewing');
+        }
       });
     }
 
@@ -50,6 +53,10 @@ block content
         $(parsed).hide();
         $('#brews').prepend(parsed);
         var ele = $('#' + id);
+        var ready = parseInt(ele.data('ready'));
+        if(ready > Date.now()) {
+          $(ele).addClass('brewing');
+        }
         var created = parseInt($(ele).data('created'));
         ele.fadeTo(1500, calculateOpacity(created));
       }
