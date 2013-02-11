@@ -7,9 +7,11 @@ block content
     - each maker in makers
       input(id='maker-' + maker.id, type='radio', name='maker', value=maker.id)
       label(for='maker-' + maker.id)= maker.name
+      br/
     h2 Select Pot
     - each pot in pots
       input(id='pot-' + pot.id, type='radio', name='pot', value=pot.id)
       label(for='pot-' + pot.id)= pot.name
+      br/
     br/
     input(type='submit', value='Submit')
