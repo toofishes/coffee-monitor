@@ -9,7 +9,7 @@ exports.recentBrews = function(req, res) {
 function fourohfour(req, res) {
   res.set('Content-Type', 'text/plain');
   res.send(404, 'Not implemented yet');
-};
+}
 
 exports.makerDetail = fourohfour;
 
@@ -70,6 +70,6 @@ exports.brewAddSubmit = function(req, res) {
   req.manager.addBrew(brew, function(err, brew) {
     res.redirect('/brews/' + brew.id);
   });
-}
+};
 
 exports.brews = fourohfour;

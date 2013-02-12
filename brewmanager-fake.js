@@ -52,10 +52,10 @@ manager.addPot({'name': 'Carafe B', 'color': 'red', 'createdAt': 1360213907000},
     function(error, pot){});
 for (var i = 0; i < 50; i++) {
   manager.addBrew({
-    'makerId': manager.makers[0]['id'],
-    'potId': manager.pots[i % 2]['id'],
-    'creationIp': '127.0.0.1',
-    'createdAt': Date.now() - (24 * 60 * 60 * 1000) + ((i + 1) / (50/24) * 60 * 60 * 1000)
+    makerId: manager.makers[0].id,
+    potId: manager.pots[i % 2].id,
+    creationIp: '127.0.0.1',
+    createdAt: Date.now() - (24 * 60 * 60 * 1000) + ((i + 1) / (50/24) * 60 * 60 * 1000)
   }, function(error, brew){});
 }
 

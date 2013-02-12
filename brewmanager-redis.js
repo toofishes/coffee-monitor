@@ -94,7 +94,7 @@ BrewManager.prototype.addBrew = function(brew, next) {
       },
       function(result, next) {
         var now = brew.createdAt;
-        var ready = parseInt(now) + (1000 * parseInt(brew.brewTime));
+        var ready = parseInt(now, 10) + (1000 * parseInt(brew.brewTime, 10));
         db.multi()
           .hset('brew:' + brew.id, 'readyAt', ready)
           .zadd('maker:' + brew.makerId + ':brews', now, brew.id)

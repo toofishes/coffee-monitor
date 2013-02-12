@@ -24,7 +24,7 @@
     "start": "node app"
   },
   "keywords": [
-	"coffee"
+    "coffee"
   ],
   "dependencies": {
     "async": "0.2.x",
@@ -35,6 +35,9 @@
     "socket.io": "0.9.x",
     "stylus": "0.32.x",
     "redis": "0.8.x"
+  },
+  "devDependencies": {
+    "jshint": "*"
   },
   "engines": {
     "node": ">=0.8"
