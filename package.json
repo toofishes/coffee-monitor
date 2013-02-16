@@ -38,9 +38,11 @@
     "redis": "0.8.x"
   },
   "devDependencies": {
+    "jitsu": "*",
     "jshint": "*"
   },
   "engines": {
     "node": ">=0.8"
-  }
+  },
+  "subdomain": "toofishes.coffee-monitor"
 }
