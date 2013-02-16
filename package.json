@@ -21,13 +21,14 @@
   ],
   "homepage": "https://github.com/toofishes/coffee-monitor",
   "scripts": {
-    "start": "node app"
+    "start": "node app.js"
   },
   "keywords": [
     "coffee"
   ],
   "dependencies": {
     "async": "0.2.x",
+    "connect-redis": "1.4.x",
     "express": "3.1.x",
     "express-validator": "0.3.x",
     "jade": "0.28.x",

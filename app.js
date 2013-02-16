@@ -35,7 +35,12 @@ app.configure(function() {
   app.use(express.compress({ filter: compressFilter }));
   app.use(express.bodyParser());
   app.use(expressValidator);
-  app.use(express.methodOverride());
+  var secret = process.env.COOKIE_SECRET || 'samplesecretcookie';
+  app.use(express.cookieParser(secret));
+  secret = process.env.SESSION_SECRET || 'samplesecretsession';
+  var RedisStore = require('connect-redis')(express);
+  var store = new RedisStore({ client: redisHelper.getConnection() });
+  app.use(express.session({ secret: secret, store: store }));
   app.use(attachBrewManager);
   app.use(app.router);
   app.use(require('stylus').middleware(__dirname + '/public'));

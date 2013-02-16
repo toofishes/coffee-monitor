@@ -5,6 +5,17 @@
     "async": {
       "version": "0.2.5"
     },
+    "connect-redis": {
+      "version": "1.4.5",
+      "dependencies": {
+        "redis": {
+          "version": "0.7.3"
+        },
+        "debug": {
+          "version": "0.7.2"
+        }
+      }
+    },
     "express": {
       "version": "3.1.0",
       "dependencies": {
