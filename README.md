@@ -100,6 +100,8 @@ TODO List
 * Send emails to people that want them
 * Jabber IMs?
 * Post to Campfire (https://github.com/tristandunn/node-campfire)
+* Add some "security" middleware (https://github.com/evilpacket/helmet)
+* Use Express.JS router (http://shtylman.com/post/expressjs-re-routing/)
 
 Credits
 -------
