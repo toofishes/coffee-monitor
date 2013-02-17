@@ -10,16 +10,7 @@ var express = require('express'),
 
 var db = redisHelper.getConnection();
 var manager = new brewmanager.BrewManager(db);
-
-passport.serializeUser(function(user, next) {
-  next(null, user.username);
-});
-
-passport.deserializeUser(function(username, next) {
-  userHelper.findByUsername(username, next);
-});
-
-passport.use(userHelper.strategy);
+userHelper.setupPassport(passport);
 
 function attachBrewManager(req, res, next) {
   req.manager = manager;

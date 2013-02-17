@@ -30,7 +30,18 @@ function verifyUser(username, password, next) {
   });
 }
 
-exports.findByUsername = findByUsername;
-exports.verifyUser = verifyUser;
-var LocalStrategy = require('passport-local').Strategy;
-exports.strategy = new LocalStrategy(verifyUser);
+function setupPassport(passport) {
+  passport.serializeUser(function(user, next) {
+    next(null, user.username);
+  });
+
+  passport.deserializeUser(function(username, next) {
+    findByUsername(username, next);
+  });
+
+  var LocalStrategy = require('passport-local').Strategy;
+  var strategy = new LocalStrategy(verifyUser);
+  passport.use(strategy);
+}
+
+exports.setupPassport = setupPassport;
