@@ -30,6 +30,15 @@ function verifyUser(username, password, next) {
   });
 }
 
+function createUser(username, password, next) {
+  bcrypt.hash(password, 11, function(err, hashedpw) {
+    if (err) { return next(err); }
+    db.hset('users', username, hashedpw, function(err) {
+      next(err);
+    });
+  });
+}
+
 function setupPassport(passport) {
   passport.serializeUser(function(user, next) {
     next(null, user.username);
@@ -44,4 +53,6 @@ function setupPassport(passport) {
   passport.use(strategy);
 }
 
+exports.verifyUser = verifyUser;
+exports.createUser = createUser;
 exports.setupPassport = setupPassport;
