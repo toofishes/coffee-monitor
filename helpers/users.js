@@ -1,12 +1,12 @@
-var LocalStrategy = require('passport-local').Strategy;
+var bcrypt = require('bcrypt');
 
 var redisHelper = require('./redis');
 var db = redisHelper.getConnection();
 
 function findByUsername(username, next) {
-  db.hget('users', username, function(err, password) {
-    if (password != null) {
-      return next(null, { username: username, password: password });
+  db.hget('users', username, function(err, hashedpw) {
+    if (hashedpw != null) {
+      return next(null, { username: username, hashedpw: hashedpw });
     }
     return next(null, null);
   });
@@ -19,14 +19,18 @@ function verifyUser(username, password, next) {
       return next(null, false,
         { message: 'Unknown user: ' + username });
     }
-    if (user.password !== password) {
-      return next(null, false,
-        { message: 'Invalid password.' });
-    }
-    return next(null, user);
+    bcrypt.compare(password, user.hashedpw, function(err, res) {
+      if (err) { return next(err); }
+      if (res === false) {
+        return next(null, false,
+          { message: 'Invalid password.' });
+      }
+      return next(null, user);
+    });
   });
 }
 
 exports.findByUsername = findByUsername;
 exports.verifyUser = verifyUser;
+var LocalStrategy = require('passport-local').Strategy;
 exports.strategy = new LocalStrategy(verifyUser);

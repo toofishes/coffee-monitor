@@ -5,6 +5,14 @@
     "async": {
       "version": "0.2.5"
     },
+    "bcrypt": {
+      "version": "0.7.3",
+      "dependencies": {
+        "bindings": {
+          "version": "1.0.0"
+        }
+      }
+    },
     "connect-redis": {
       "version": "1.4.5",
       "dependencies": {
@@ -100,6 +108,14 @@
     },
     "passport": {
       "version": "0.1.15",
+      "dependencies": {
+        "pkginfo": {
+          "version": "0.2.3"
+        }
+      }
+    },
+    "passport-local": {
+      "version": "0.1.6",
       "dependencies": {
         "pkginfo": {
           "version": "0.2.3"
