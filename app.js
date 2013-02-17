@@ -1,7 +1,7 @@
 var express = require('express'),
-    expressValidator = require('express-validator'),
     routes = require('./routes'),
     http = require('http'),
+    passport = require('passport'),
     path = require('path'),
     redisHelper = require('./helpers/redis'),
     signals = require('./helpers/signals'),
@@ -9,6 +9,45 @@ var express = require('express'),
 
 var db = redisHelper.getConnection();
 var manager = new brewmanager.BrewManager();
+
+var users = [
+  { username: 'testuser', password: 'testpass' }
+];
+
+function findByUsername(username, next) {
+  for (var i = 0, len = users.length; i < len; i++) {
+    if (users[i].username === username) {
+      return next(null, users[i]);
+    }
+  }
+  return next(null, null);
+}
+
+function verifyUser(username, password, next) {
+  findByUsername(username, function(err, user) {
+    if (err) { return next(err); }
+    if (!user) {
+      return next(null, false,
+        { message: 'Unknown user: ' + username });
+    }
+    if (user.password !== password) {
+      return next(null, false,
+        { message: 'Invalid password.' });
+    }
+    return next(null, user);
+  });
+}
+
+passport.serializeUser(function(user, next) {
+  next(null, user.username);
+});
+
+passport.deserializeUser(function(username, next) {
+  findByUsername(username, next);
+});
+
+var LocalStrategy = require('passport-local').Strategy;
+passport.use(new LocalStrategy(verifyUser));
 
 function attachBrewManager(req, res, next) {
   req.manager = manager;
@@ -34,13 +73,15 @@ app.configure(function() {
   app.use(express.logger('dev'));
   app.use(express.compress({ filter: compressFilter }));
   app.use(express.bodyParser());
-  app.use(expressValidator);
+  app.use(require('express-validator'));
   var secret = process.env.COOKIE_SECRET || 'samplesecretcookie';
   app.use(express.cookieParser(secret));
   secret = process.env.SESSION_SECRET || 'samplesecretsession';
   var RedisStore = require('connect-redis')(express);
   var store = new RedisStore({ client: redisHelper.getConnection() });
   app.use(express.session({ secret: secret, store: store }));
+  app.use(passport.initialize());
+  app.use(passport.session());
   app.use(attachBrewManager);
   app.use(app.router);
   app.use(require('stylus').middleware(__dirname + '/public'));
@@ -63,6 +104,16 @@ app.get('/brews/:id', onlineTracker, routes.brewDetail);
 app.delete('/brews/:id', routes.brewDelete);
 app.get('/brews', onlineTracker, routes.brews);
 
+// Authentication
+app.post('/login',
+  passport.authenticate('local', {
+    successRedirect: '/',
+    failureRedirect: '/login'
+  }));
+app.get('/logout', function(req, res) {
+  req.logout();
+  res.redirect('/');
+});
 
 var server = http.createServer(app);
 server.listen(app.get('port'), function() {

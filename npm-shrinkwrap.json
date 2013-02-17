@@ -98,6 +98,17 @@
     "moment": {
       "version": "2.0.0"
     },
+    "passport": {
+      "version": "0.1.15",
+      "dependencies": {
+        "pkginfo": {
+          "version": "0.2.3"
+        }
+      }
+    },
+    "redis": {
+      "version": "0.8.2"
+    },
     "socket.io": {
       "version": "0.9.13",
       "dependencies": {
@@ -158,9 +169,6 @@
           "version": "0.7.2"
         }
       }
-    },
-    "redis": {
-      "version": "0.8.2"
     },
     "jshint": {
       "version": "0.9.1",
