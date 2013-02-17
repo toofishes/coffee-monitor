@@ -50,7 +50,7 @@ app.configure(function() {
   app.use(express.cookieParser(secret));
   secret = process.env.SESSION_SECRET || 'samplesecretsession';
   var RedisStore = require('connect-redis')(express);
-  var store = new RedisStore({ client: redisHelper.getConnection() });
+  var store = new RedisStore({ client: db });
   app.use(express.session({ secret: secret, store: store }));
   app.use(passport.initialize());
   app.use(passport.session());
@@ -105,7 +105,7 @@ io.configure(function() {
     redis: redisHelper.redis,
     redisPub: redisHelper.getConnection(),
     redisSub: redisHelper.getConnection(),
-    redisClient: redisHelper.getConnection()
+    redisClient: db
   }));
 });
 
