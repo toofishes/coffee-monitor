@@ -9,7 +9,7 @@ var express = require('express'),
     brewmanager = require('./brewmanager-redis');
 
 var db = redisHelper.getConnection();
-var manager = new brewmanager.BrewManager();
+var manager = new brewmanager.BrewManager(db);
 
 passport.serializeUser(function(user, next) {
   next(null, user.username);

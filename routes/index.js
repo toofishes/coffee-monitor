@@ -38,13 +38,15 @@ exports.brewDelete = function(req, res) {
 
 exports.brewAdd = function(req, res) {
   var man = req.manager;
-  async.parallel([man.getMakers, man.getPots], function(err, results) {
-    res.render('brew-add', {
-      'title': 'Add Brew',
-      'makers': results[0],
-      'pots': results[1]
+  async.parallel(
+    [man.getMakers.bind(man), man.getPots.bind(man)],
+    function(err, results) {
+      res.render('brew-add', {
+        'title': 'Add Brew',
+        'makers': results[0],
+        'pots': results[1]
+      });
     });
-  });
 };
 
 exports.brewAddSubmit = function(req, res) {

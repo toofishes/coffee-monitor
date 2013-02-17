@@ -1,16 +1,15 @@
-var async = require('async'),
-    redisHelper = require('./helpers/redis');
+var async = require('async');
 
-var db = redisHelper.getConnection();
-
-BrewManager = function(){};
+BrewManager = function(db) { this.db = db; };
+BrewManager.prototype = { db: null };
 
 BrewManager.prototype.getRecentBrews = function(next) {
+  var self = this;
   // first, get IDs of most recent brews- 8 hour cutoff
   var cutoff = Date.now() - (8 * 60 * 60 * 1000);
-  db.zrevrangebyscore('brews', '+inf', cutoff, function(err, brewIds) {
+  self.db.zrevrangebyscore('brews', '+inf', cutoff, function(err, brewIds) {
     // with those IDs, retrieve the objects themselves as a list of maps
-    var m = db.multi();
+    var m = self.db.multi();
     brewIds.forEach(function(id, idx) {
       m.hgetall('brew:' + id);
     });
@@ -18,29 +17,30 @@ BrewManager.prototype.getRecentBrews = function(next) {
   });
 };
 
-function storePartTwo(err, obj, type, next) {
+function storePartTwo(err, db, obj, type, next) {
   // coerce any non-string keys to strings
   Object.keys(obj).forEach(function(key) { obj[key] = "" + obj[key]; });
   db.hmset(type + ':' + obj.id, obj, next);
 }
 
-function storeAsHash(obj, type, seqName, next) {
+function storeAsHash(db, obj, type, seqName, next) {
   if (!obj.hasOwnProperty('createdAt') || obj.createdAt === null) {
     obj.createdAt = Date.now();
   }
   if (!obj.hasOwnProperty('id') || obj.id === null) {
     db.incr(seqName, function(err, val) {
       obj.id = val;
-      storePartTwo(err, obj, type, next);
+      storePartTwo(err, db, obj, type, next);
     });
   } else {
-    storePartTwo(null, obj, type, next);
+    storePartTwo(null, db, obj, type, next);
   }
 }
 
 BrewManager.prototype.getMakers = function(next) {
-  db.smembers('makers', function(err, ids) {
-    var m = db.multi();
+  var self = this;
+  self.db.smembers('makers', function(err, ids) {
+    var m = self.db.multi();
     ids.forEach(function(id, idx) {
       m.hgetall('maker:' + id);
     });
@@ -49,14 +49,16 @@ BrewManager.prototype.getMakers = function(next) {
 };
 
 BrewManager.prototype.addMaker = function(maker, next) {
-  storeAsHash(maker, 'maker', 'nextMakerId', function(err) {
-    db.sadd('makers', maker.id, next);
+  var self = this;
+  storeAsHash(self.db, maker, 'maker', 'nextMakerId', function(err) {
+    self.db.sadd('makers', maker.id, next);
   });
 };
 
 BrewManager.prototype.getPots = function(next) {
-  db.smembers('pots', function(err, ids) {
-    var m = db.multi();
+  var self = this;
+  self.db.smembers('pots', function(err, ids) {
+    var m = self.db.multi();
     ids.forEach(function(id, idx) {
       m.hgetall('pot:' + id);
     });
@@ -65,19 +67,21 @@ BrewManager.prototype.getPots = function(next) {
 };
 
 BrewManager.prototype.addPot = function(pot, next) {
-  storeAsHash(pot, 'pot', 'nextPotId', function(err) {
-    db.sadd('pots', pot.id, next);
+  var self = this;
+  storeAsHash(self.db, pot, 'pot', 'nextPotId', function(err) {
+    self.db.sadd('pots', pot.id, next);
   });
 };
 
 BrewManager.prototype.getBrew = function(id, next) {
-  db.hgetall('brew:' + id, next);
+  this.db.hgetall('brew:' + id, next);
 };
 
 BrewManager.prototype.addBrew = function(brew, next) {
+  var self = this;
   async.waterfall([
       function(next) {
-        db.multi()
+        self.db.multi()
           .hmget('maker:' + brew.makerId, 'name', 'brewTime')
           .hmget('pot:' + brew.potId, 'name', 'color')
           .exec(next);
@@ -90,12 +94,12 @@ BrewManager.prototype.addBrew = function(brew, next) {
         next(null, brew);
       },
       function(brew, next) {
-        storeAsHash(brew, 'brew', 'nextBrewId', next);
+        storeAsHash(self.db, brew, 'brew', 'nextBrewId', next);
       },
       function(result, next) {
         var now = brew.createdAt;
         var ready = parseInt(now, 10) + (1000 * parseInt(brew.brewTime, 10));
-        db.multi()
+        self.db.multi()
           .hset('brew:' + brew.id, 'readyAt', ready)
           .zadd('maker:' + brew.makerId + ':brews', now, brew.id)
           .zadd('pot:' + brew.potId + ':brews', now, brew.id)
@@ -109,11 +113,12 @@ BrewManager.prototype.addBrew = function(brew, next) {
 };
 
 BrewManager.prototype.deleteBrew = function(id, next) {
-  this.getBrew(id, function(err, brew) {
+  var self = this;
+  self.getBrew(id, function(err, brew) {
     if(!brew) {
       next(null);
     } else {
-      db.multi()
+      self.db.multi()
       .del('brew:' + id)
       .zrem('maker:' + brew.makerId + ':brews', brew.id)
       .zrem('pot:' + brew.potId + ':brews', brew.id)
@@ -126,8 +131,8 @@ BrewManager.prototype.deleteBrew = function(id, next) {
 
 exports.BrewManager = BrewManager;
 
-exports.createDummyBrewData = function() {
-  var manager = new BrewManager();
+exports.createDummyBrewData = function(db) {
+  var manager = new BrewManager(db);
 
   function createBrews(howmany) {
     for (var i = 0; i < howmany; i++) {
@@ -136,12 +141,12 @@ exports.createDummyBrewData = function() {
           creationIp: '127.0.0.1',
           createdAt: Date.now() - (24 * 60 * 60 * 1000) + ((i + 1) / (50/24) * 60 * 60 * 1000)
         };
-        db.multi()
-        .srandmember('makers', function(err, val) { brew.makerId = val; })
-        .srandmember('pots', function(err, val) { brew.potId = val; })
-        .exec(function(err, replies) {
-          manager.addBrew(brew, function(error, brew){});
-        });
+        manager.db.multi()
+          .srandmember('makers', function(err, val) { brew.makerId = val; })
+          .srandmember('pots', function(err, val) { brew.potId = val; })
+          .exec(function(err, replies) {
+            manager.addBrew(brew, function(error, brew){});
+          });
       })(i);
     }
   }
