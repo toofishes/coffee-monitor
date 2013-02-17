@@ -1,6 +1,6 @@
 var async = require('async');
 
-BrewManager = function(db) { this.db = db; };
+var BrewManager = function(db) { this.db = db; };
 BrewManager.prototype = { db: null };
 
 BrewManager.prototype.getRecentBrews = function(next) {

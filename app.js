@@ -16,7 +16,7 @@ passport.serializeUser(function(user, next) {
 });
 
 passport.deserializeUser(function(username, next) {
-  findByUsername(username, next);
+  userHelper.findByUsername(username, next);
 });
 
 passport.use(userHelper.strategy);

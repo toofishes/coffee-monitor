@@ -1,16 +1,15 @@
 var LocalStrategy = require('passport-local').Strategy;
 
-var users = [
-  { username: 'testuser', password: 'testpass' }
-];
+var redisHelper = require('./redis');
+var db = redisHelper.getConnection();
 
 function findByUsername(username, next) {
-  for (var i = 0, len = users.length; i < len; i++) {
-    if (users[i].username === username) {
-      return next(null, users[i]);
+  db.hget('users', username, function(err, password) {
+    if (password != null) {
+      return next(null, { username: username, password: password });
     }
-  }
-  return next(null, null);
+    return next(null, null);
+  });
 }
 
 function verifyUser(username, password, next) {
@@ -28,5 +27,6 @@ function verifyUser(username, password, next) {
   });
 }
 
+exports.findByUsername = findByUsername;
 exports.verifyUser = verifyUser;
 exports.strategy = new LocalStrategy(verifyUser);
