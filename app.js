@@ -5,38 +5,11 @@ var express = require('express'),
     path = require('path'),
     redisHelper = require('./helpers/redis'),
     signals = require('./helpers/signals'),
+    userHelper = require('./helpers/users'),
     brewmanager = require('./brewmanager-redis');
 
 var db = redisHelper.getConnection();
 var manager = new brewmanager.BrewManager();
-
-var users = [
-  { username: 'testuser', password: 'testpass' }
-];
-
-function findByUsername(username, next) {
-  for (var i = 0, len = users.length; i < len; i++) {
-    if (users[i].username === username) {
-      return next(null, users[i]);
-    }
-  }
-  return next(null, null);
-}
-
-function verifyUser(username, password, next) {
-  findByUsername(username, function(err, user) {
-    if (err) { return next(err); }
-    if (!user) {
-      return next(null, false,
-        { message: 'Unknown user: ' + username });
-    }
-    if (user.password !== password) {
-      return next(null, false,
-        { message: 'Invalid password.' });
-    }
-    return next(null, user);
-  });
-}
 
 passport.serializeUser(function(user, next) {
   next(null, user.username);
@@ -46,8 +19,7 @@ passport.deserializeUser(function(username, next) {
   findByUsername(username, next);
 });
 
-var LocalStrategy = require('passport-local').Strategy;
-passport.use(new LocalStrategy(verifyUser));
+passport.use(userHelper.strategy);
 
 function attachBrewManager(req, res, next) {
   req.manager = manager;
