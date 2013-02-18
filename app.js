@@ -68,15 +68,9 @@ app.delete('/brews/:id', routes.brewDelete);
 app.get('/brews', onlineTracker, routes.brews);
 
 // Authentication
-app.post('/login',
-  passport.authenticate('local', {
-    successRedirect: '/',
-    failureRedirect: '/login'
-  }));
-app.get('/logout', function(req, res) {
-  req.logout();
-  res.redirect('/');
-});
+app.get('/login', onlineTracker, routes.login);
+app.post('/login', routes.loginSubmit);
+app.get('/logout', routes.logout);
 
 var server = http.createServer(app);
 server.listen(app.get('port'), function() {

@@ -1,4 +1,5 @@
-var async = require('async');
+var async = require('async'),
+    passport = require('passport');
 
 exports.recentBrews = function(req, res) {
   req.manager.getRecentBrews(function(error, brews) {
@@ -75,3 +76,24 @@ exports.brewAddSubmit = function(req, res) {
 };
 
 exports.brews = fourohfour;
+
+
+// Authentication
+
+exports.login = function(req, res) {
+  res.render('login', {
+    'title': 'Login',
+  });
+};
+
+exports.loginSubmit = function(req, res, next) {
+  passport.authenticate('local', {
+    successRedirect: '/',
+    failureRedirect: '/login'
+  })(req, res, next);
+};
+
+exports.logout = function(req, res) {
+  req.logout();
+  res.redirect('/');
+};

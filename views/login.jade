@@ -1,0 +1,13 @@
+extends layout
+
+block content
+  h1= title
+  form(method='post')
+    h2 Login
+    label(for='username') Username
+    input(id='username', name='username')
+    br/
+    label(for='password') Password
+    input(id='password', name='password', type='password')
+    br/
+    input(type='submit', value='Submit')
