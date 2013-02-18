@@ -3,13 +3,13 @@ var express = require('express'),
     http = require('http'),
     passport = require('passport'),
     path = require('path'),
+    brewHelper = require('./helpers/brews'),
     redisHelper = require('./helpers/redis'),
     signals = require('./helpers/signals'),
-    userHelper = require('./helpers/users'),
-    brewmanager = require('./brewmanager-redis');
+    userHelper = require('./helpers/users');
 
 var db = redisHelper.getConnection();
-var manager = new brewmanager.BrewManager(db);
+var manager = new brewHelper.BrewManager(db);
 userHelper.setupPassport(passport);
 
 function attachBrewManager(req, res, next) {
