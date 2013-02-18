@@ -66,6 +66,7 @@ app.post('/brews/add', routes.brewAddSubmit);
 app.get('/brews/:id', onlineTracker, routes.brewDetail);
 app.delete('/brews/:id', routes.brewDelete);
 app.get('/brews', onlineTracker, routes.brews);
+app.get('/tea', onlineTracker, routes.teapot);
 
 // Authentication
 app.get('/login', onlineTracker, routes.login);

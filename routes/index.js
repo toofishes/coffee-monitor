@@ -97,3 +97,11 @@ exports.logout = function(req, res) {
   req.logout();
   res.redirect('/');
 };
+
+
+// Other
+
+exports.teapot = function(req, res) {
+  res.set('Content-Type', 'text/plain');
+  res.send(418, 'I\'m a teapot');
+}
