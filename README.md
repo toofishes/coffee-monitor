@@ -82,25 +82,9 @@ TODO List
 ---------
 
 * Track currently connected clients (by IP?)
-* Read-only view page
-  - Large 'big-board' version
-  - Normal desktop computer version
-  - Mobile-friendly version
-* Simple "press when brewing" screen
-* Don't crash the whole server process on Redis errors (or callbacks passed in)
-* Utilize brew started vs. brew finished information
-* Timing issues if host vs. client clocks differ (don't ever trust Date.now()
-  in client?)
-* Configurable:
-  - coffee maker inventory and info- name, model, time to brew, size?, etc.
-  - carafe inventory- size?, color marker, etc.
-* Switch away from Socket.IO; use https://github.com/einaros/ws
-* Provide an RSS feed (https://github.com/dylang/node-rss)
 * Tweet brewed pots? (https://github.com/ttezel/twit)
 * Send emails to people that want them
 * Jabber IMs?
-* Add some "security" middleware (https://github.com/evilpacket/helmet)
-* Use Express.JS router (http://shtylman.com/post/expressjs-re-routing/)
 
 Credits
 -------
