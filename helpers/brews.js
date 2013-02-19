@@ -120,7 +120,8 @@ BrewManager.prototype.addBrew = function(brew, next) {
         var now = Date.now();
         var makerReady = results[0][2] || 0;
         var potReady = results[1][2] || 0;
-        if (makerReady > now || potReady > now) {
+        if (process.env.NODE_ENV === 'production' &&
+			(makerReady > now || potReady > now)) {
           next("Not enough time elapsed for brew to make sense!");
           return;
         }
