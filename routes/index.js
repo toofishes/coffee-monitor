@@ -171,7 +171,8 @@ exports.brewAddSubmit = function(req, res) {
       res.send(400, 'Error!\n' + err);
       return;
     }
-    res.redirect('/brews/' + brew.id);
+    //res.redirect('/brews/' + brew.id);
+    res.redirect('/');
   });
 };
 

@@ -2,6 +2,8 @@ extends layout
 
 block content
   h1= title
+  p
+    a(href='/brews/add/simple') Add new brew
   #brews
     - each brew in brews
       include includes/brew-single
