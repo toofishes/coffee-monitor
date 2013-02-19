@@ -1,7 +1,7 @@
 {
   "name": "coffee-monitor",
   "description": "Monitor when coffee pots were brewed",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": "Dan McGee <dpmcgee@gmail.com>",
   "private": true,
   "bugs": {
@@ -29,6 +29,7 @@
   "dependencies": {
     "async": "0.2.x",
     "bcrypt": "0.7.x",
+    "campfire": "0.1.x",
     "connect-redis": "1.4.x",
     "express": "3.1.x",
     "express-validator": "0.3.x",

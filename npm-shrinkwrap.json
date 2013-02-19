@@ -1,6 +1,6 @@
 {
   "name": "coffee-monitor",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "dependencies": {
     "async": {
       "version": "0.2.5"
@@ -12,6 +12,9 @@
           "version": "1.0.0"
         }
       }
+    },
+    "campfire": {
+      "version": "0.1.1"
     },
     "connect-redis": {
       "version": "1.4.5",

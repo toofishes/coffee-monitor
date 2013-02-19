@@ -1,4 +1,5 @@
-var async = require('async');
+var async = require('async'),
+    campfireHelper = require('./campfire');
 
 exports.recentBrews = function(app, socket, manager) {
   manager.getRecentBrews(function(err, brews) {
@@ -17,6 +18,7 @@ exports.updateBrew = function(app, io, manager, brewId) {
     app.render('includes/brew-single', {brew: brew}, function(err, html) {
       io.sockets.emit('updateBrew', html);
     });
+    campfireHelper.postBrew(brew);
   });
 };
 
