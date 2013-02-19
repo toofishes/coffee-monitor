@@ -166,6 +166,11 @@ exports.brewAddSubmit = function(req, res) {
   };
 
   req.manager.addBrew(brew, function(err, brew) {
+    if (err) {
+      res.set('Content-Type', 'text/plain');
+      res.send(400, 'Error!\n' + err);
+      return;
+    }
     res.redirect('/brews/' + brew.id);
   });
 };

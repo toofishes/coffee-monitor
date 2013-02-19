@@ -58,7 +58,7 @@ BrewManager.prototype.addMaker = function(maker, next) {
         self.db.sadd('makers', maker.id, next);
       }
   ], function(err, results) {
-    next(null, maker);
+    next(err, maker);
   });
 };
 
@@ -110,11 +110,20 @@ BrewManager.prototype.addBrew = function(brew, next) {
   async.waterfall([
       function(next) {
         self.db.multi()
-          .hmget('maker:' + brew.makerId, 'name', 'brewTime')
-          .hmget('pot:' + brew.potId, 'name', 'color')
+          .hmget('maker:' + brew.makerId, 'name', 'brewTime', 'readyAt')
+          .hmget('pot:' + brew.potId, 'name', 'color', 'readyAt')
           .exec(next);
       },
       function(results, next) {
+        // check preconditions first: we must be > readyAt time for this brew
+        // to even make sense, otherwise someone is spoofing us
+        var now = Date.now();
+        var makerReady = results[0][2] || 0;
+        var potReady = results[1][2] || 0;
+        if (makerReady > now || potReady > now) {
+          next("Not enough time elapsed for brew to make sense!");
+          return;
+        }
         brew.makerName = results[0][0];
         brew.brewTime = results[0][1];
         brew.potName = results[1][0];
@@ -131,12 +140,16 @@ BrewManager.prototype.addBrew = function(brew, next) {
           .hset('brew:' + brew.id, 'readyAt', ready)
           .zadd('maker:' + brew.makerId + ':brews', now, brew.id)
           .zadd('pot:' + brew.potId + ':brews', now, brew.id)
+          .hmset('maker:' + brew.makerId, 'lastBrew', now,
+              'readyAt', ready)
+          .hmset('pot:' + brew.potId, 'lastBrew', now,
+              'readyAt', ready)
           .zadd('brews', now, brew.id)
           .publish('updateBrew', brew.id)
           .exec(next);
       }
   ], function(err, results) {
-    next(null, brew);
+    next(err, brew);
   });
 };
 
