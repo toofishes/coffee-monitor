@@ -1,0 +1,12 @@
+extends layout
+
+block content
+  h1= title
+  form(method='post')
+    label(for='name') Name
+    input(id='name', name='name')
+    br/
+    label(for='brewTime') Brew time (seconds)
+    input(id='brewTime', name='brewTime', type='number', min='0', max='1800')
+    br/
+    input(type='submit', value='Submit')

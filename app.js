@@ -57,15 +57,25 @@ app.configure('development', function() {
 
 // Start defining routes
 app.get('/', onlineTracker, routes.recentBrews);
+
+app.get('/makers/add', routes.makerAdd);
+app.post('/makers/add', routes.makerAddSubmit);
 app.get('/makers/:id', onlineTracker, routes.makerDetail);
+app.delete('/makers/:id', routes.makerDelete);
 app.get('/makers', onlineTracker, routes.makers);
+
+app.get('/pots/add', routes.potAdd);
+app.post('/pots/add', routes.potAddSubmit);
 app.get('/pots/:id', onlineTracker, routes.potDetail);
+app.delete('/pots/:id', routes.potDelete);
 app.get('/pots', onlineTracker, routes.pots);
+
 app.get('/brews/add', routes.brewAdd);
 app.post('/brews/add', routes.brewAddSubmit);
 app.get('/brews/:id', onlineTracker, routes.brewDetail);
 app.delete('/brews/:id', routes.brewDelete);
 app.get('/brews', onlineTracker, routes.brews);
+
 app.get('/tea', onlineTracker, routes.teapot);
 
 // Authentication

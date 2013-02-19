@@ -50,9 +50,23 @@ BrewManager.prototype.getMakers = function(next) {
 
 BrewManager.prototype.addMaker = function(maker, next) {
   var self = this;
-  storeAsHash(self.db, maker, 'maker', 'nextMakerId', function(err) {
-    self.db.sadd('makers', maker.id, next);
+  async.waterfall([
+      function(next) {
+        storeAsHash(self.db, maker, 'maker', 'nextMakerId', next);
+      },
+      function(result, next) {
+        self.db.sadd('makers', maker.id, next);
+      }
+  ], function(err, results) {
+    next(null, maker);
   });
+};
+
+BrewManager.prototype.deleteMaker = function(id, next) {
+  this.db.multi()
+    .srem('makers', id)
+    .hset('makers:' + id, 'active', 0)
+    .exec(next);
 };
 
 BrewManager.prototype.getPots = function(next) {
@@ -68,9 +82,23 @@ BrewManager.prototype.getPots = function(next) {
 
 BrewManager.prototype.addPot = function(pot, next) {
   var self = this;
-  storeAsHash(self.db, pot, 'pot', 'nextPotId', function(err) {
-    self.db.sadd('pots', pot.id, next);
+  async.waterfall([
+      function(next) {
+        storeAsHash(self.db, pot, 'pot', 'nextPotId', next);
+      },
+      function(result, next) {
+        self.db.sadd('pots', pot.id, next);
+      }
+  ], function(err, results) {
+    next(err, pot);
   });
+};
+
+BrewManager.prototype.deletePot = function(id, next) {
+  this.db.multi()
+    .srem('pots', id)
+    .hset('pots:' + id, 'active', 0)
+    .exec(next);
 };
 
 BrewManager.prototype.getBrew = function(id, next) {

@@ -12,13 +12,95 @@ function fourohfour(req, res) {
   res.send(404, 'Not implemented yet');
 }
 
+
+// Coffee Makers
+
 exports.makerDetail = fourohfour;
+
+exports.makerAdd = function(req, res) {
+  res.render('maker-add', {
+    'title': 'Add Coffee Maker'
+  });
+};
+
+exports.makerAddSubmit = function(req, res) {
+  req.assert('name').notEmpty();
+  req.assert('brewTime').notEmpty().isInt().min(0).max(1800);
+
+  var errors = req.validationErrors();
+  if(errors) {
+    res.set('Content-Type', 'text/plain');
+    res.send(400, 'Validation failed!\n' + require('util').inspect(errors));
+    return;
+  }
+
+  var name = req.sanitize('name').trim();
+  var brewTime = req.sanitize('brewTime').toInt();
+  var maker = {
+    name: name,
+    brewTime: brewTime,
+    active: 1,
+    createdAt: Date.now(),
+  };
+
+  req.manager.addMaker(maker, function(err, maker) {
+    res.redirect('/makers/' + maker.id);
+  });
+};
+
+exports.makerDelete = function(req, res) {
+  req.manager.deleteMaker(req.params.id, function(err) {
+    res.send(204, null);
+  });
+};
 
 exports.makers = fourohfour;
 
+
+// Pots
+
 exports.potDetail = fourohfour;
 
+exports.potAdd = function(req, res) {
+  res.render('pot-add', {
+    'title': 'Add Coffee Pot'
+  });
+};
+
+exports.potAddSubmit = function(req, res) {
+  req.assert('name').notEmpty();
+  req.assert('color').isIn(['blue', 'green', 'red']);
+
+  var errors = req.validationErrors();
+  if(errors) {
+    res.set('Content-Type', 'text/plain');
+    res.send(400, 'Validation failed!\n' + require('util').inspect(errors));
+    return;
+  }
+
+  var name = req.sanitize('name').trim();
+  var color = req.sanitize('color').trim();
+  var pot = {
+    name: name,
+    color: color,
+    active: 1,
+    createdAt: Date.now(),
+  };
+
+  req.manager.addPot(pot, function(err, pot) {
+    res.redirect('/pots/' + pot.id);
+  });
+};
+
+exports.potDelete = function(req, res) {
+  req.manager.deletePot(req.params.id, function(err) {
+    res.send(204, null);
+  });
+};
 exports.pots = fourohfour;
+
+
+// Brews
 
 exports.brewDetail = function(req, res) {
   req.manager.getBrew(req.params.id, function(error, brew) {

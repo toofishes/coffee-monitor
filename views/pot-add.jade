@@ -1,0 +1,15 @@
+extends layout
+
+block content
+  h1= title
+  form(method='post')
+    label(for='name') Name
+    input(id='name', name='name')
+    br/
+    label(for='color') Color
+    select(id='color', name='color')
+      option(value='blue') Blue
+      option(value='green') Green
+      option(value='red') Red
+    br/
+    input(type='submit', value='Submit')
