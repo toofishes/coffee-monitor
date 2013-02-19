@@ -35,9 +35,10 @@ function compressFilter(req, res) {
 }
 
 function ensureAuthenticatedOrKnownIp(req, res, next) {
-  var ip = req.ip;
+  var ip = req.ip,
+      blessed_ip = process.env.BLESSED_IP || "notarealip";
   if (ip === "127.0.0.1" || ip === "::1" ||
-      ip === (process.env.BLESSED_IP || "notarealip")) {
+      blessed_ip === '*' || ip === blessed_ip) {
     return next();
   }
   return userHelper.ensureAuthenticated(req, res, next);
