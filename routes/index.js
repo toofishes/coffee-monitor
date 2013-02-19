@@ -69,7 +69,7 @@ exports.potAdd = function(req, res) {
 
 exports.potAddSubmit = function(req, res) {
   req.assert('name').notEmpty();
-  req.assert('color').isIn(['blue', 'green', 'red']);
+  req.assert('color').isIn(['black', 'blue', 'green', 'red', 'white']);
 
   var errors = req.validationErrors();
   if(errors) {

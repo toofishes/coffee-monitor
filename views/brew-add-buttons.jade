@@ -5,5 +5,5 @@ block content
   form(action='/brews/add', method='post', id='brew-simple-form')
     input(type='hidden', name='maker', value='1')
     - each pot in pots
-      button(id='pot-' + pot.id, type='radio', name='pot', value=pot.id, class='pot-' + pot.color) Pot #{pot.id}
+      button(id='pot-' + pot.id, type='radio', name='pot', value=pot.id, class='pot-' + pot.color) #{pot.name}
       br/
