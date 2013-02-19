@@ -36,10 +36,8 @@ function compressFilter(req, res) {
 
 function ensureAuthenticatedOrKnownIp(req, res, next) {
   var ip = req.ip;
-  console.log("req.ip?", req.ip);
   if (ip === "127.0.0.1" || ip === "::1" ||
       ip === (process.env.BLESSED_IP || "notarealip")) {
-    console.log("skipping auth, known IP satisified");
     return next();
   }
   return userHelper.ensureAuthenticated(req, res, next);
