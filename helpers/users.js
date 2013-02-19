@@ -6,7 +6,12 @@ var db = redisHelper.getConnection();
 function findByUsername(username, next) {
   db.hget('users', username, function(err, hashedpw) {
     if (hashedpw != null) {
-      return next(null, { username: username, hashedpw: hashedpw });
+      var user = {
+        username: username,
+        hashedpw: hashedpw,
+        admin: false
+      };
+      return next(null, user);
     }
     return next(null, null);
   });
@@ -53,6 +58,27 @@ function setupPassport(passport) {
   passport.use(strategy);
 }
 
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  // save desired URL for later redirect
+  req.session.redirect = req.url;
+  return res.redirect("/login");
+}
+
+function ensureAdmin(req, res, next) {
+  ensureAuthenticated(req, res, function(req, res, next) {
+    if(!req.user.admin) {
+      res.set('Content-Type', 'text/plain');
+      res.send(403, 'You can\'t do that!');
+    }
+    return next();
+  });
+}
+
 exports.verifyUser = verifyUser;
 exports.createUser = createUser;
 exports.setupPassport = setupPassport;
+exports.ensureAuthenticated = ensureAuthenticated;
+exports.ensureAdmin = ensureAdmin;

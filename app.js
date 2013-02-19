@@ -12,8 +12,17 @@ var db = redisHelper.getConnection();
 var manager = new brewHelper.BrewManager(db);
 userHelper.setupPassport(passport);
 
+
+// Middleware stuff
+
 function attachBrewManager(req, res, next) {
   req.manager = manager;
+  next();
+}
+
+function attachPassport(req, res, next) {
+  res.locals.authenticated = req.isAuthenticated();
+  res.locals.user = req.user;
   next();
 }
 
@@ -24,6 +33,20 @@ function onlineTracker(req, res, next) {
 function compressFilter(req, res) {
   return (/json|text|javascript|svg\+xml/).test(res.getHeader('Content-Type'));
 }
+
+function ensureAuthenticatedOrKnownIp(req, res, next) {
+  var ip = req.ip;
+  console.log("req.ip?", req.ip);
+  if (ip === "127.0.0.1" || ip === "::1" ||
+      ip === (process.env.BLESSED_IP || "notarealip")) {
+    console.log("skipping auth, known IP satisified");
+    return next();
+  }
+  return userHelper.ensureAuthenticated(req, res, next);
+}
+
+
+// App setup
 
 var app = express();
 app.locals.moment = require('moment');
@@ -46,6 +69,7 @@ app.configure(function() {
   app.use(passport.initialize());
   app.use(passport.session());
   app.use(attachBrewManager);
+  app.use(attachPassport);
   app.use(app.router);
   app.use(require('stylus').middleware(__dirname + '/public'));
   app.use(express.static(path.join(__dirname, 'public')));
@@ -58,22 +82,22 @@ app.configure('development', function() {
 // Start defining routes
 app.get('/', onlineTracker, routes.recentBrews);
 
-app.get('/makers/add', routes.makerAdd);
-app.post('/makers/add', routes.makerAddSubmit);
+app.get('/makers/add', userHelper.ensureAuthenticated, routes.makerAdd);
+app.post('/makers/add', userHelper.ensureAuthenticated, routes.makerAddSubmit);
 app.get('/makers/:id', onlineTracker, routes.makerDetail);
-app.delete('/makers/:id', routes.makerDelete);
+app.delete('/makers/:id', userHelper.ensureAuthenticated, routes.makerDelete);
 app.get('/makers', onlineTracker, routes.makers);
 
-app.get('/pots/add', routes.potAdd);
-app.post('/pots/add', routes.potAddSubmit);
+app.get('/pots/add', userHelper.ensureAuthenticated, routes.potAdd);
+app.post('/pots/add', userHelper.ensureAuthenticated, routes.potAddSubmit);
 app.get('/pots/:id', onlineTracker, routes.potDetail);
-app.delete('/pots/:id', routes.potDelete);
+app.delete('/pots/:id', userHelper.ensureAuthenticated, routes.potDelete);
 app.get('/pots', onlineTracker, routes.pots);
 
-app.get('/brews/add', routes.brewAdd);
-app.post('/brews/add', routes.brewAddSubmit);
+app.get('/brews/add', ensureAuthenticatedOrKnownIp, routes.brewAdd);
+app.post('/brews/add', ensureAuthenticatedOrKnownIp, routes.brewAddSubmit);
 app.get('/brews/:id', onlineTracker, routes.brewDetail);
-app.delete('/brews/:id', routes.brewDelete);
+app.delete('/brews/:id', userHelper.ensureAuthenticated, routes.brewDelete);
 app.get('/brews', onlineTracker, routes.brews);
 
 app.get('/tea', onlineTracker, routes.teapot);
