@@ -132,6 +132,19 @@ exports.brewAdd = function(req, res) {
     });
 };
 
+exports.brewAddSimple = function(req, res) {
+  var man = req.manager;
+  async.parallel(
+    [man.getMakers.bind(man), man.getPots.bind(man)],
+    function(err, results) {
+      res.render('brew-add-buttons', {
+        'title': 'Add Brew for Pot',
+        'makers': results[0],
+        'pots': results[1]
+      });
+    });
+};
+
 exports.brewAddSubmit = function(req, res) {
   req.assert('maker').notEmpty().isInt();
   req.assert('pot').notEmpty().isInt();

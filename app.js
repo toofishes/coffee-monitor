@@ -36,6 +36,8 @@ function compressFilter(req, res) {
 
 function ensureAuthenticatedOrKnownIp(req, res, next) {
   var ip = req.ip;
+  console.log("ip", ip);
+  console.log("ips", req.ips);
   if (ip === "127.0.0.1" || ip === "::1" ||
       ip === (process.env.BLESSED_IP || "notarealip")) {
     return next();
@@ -52,6 +54,7 @@ app.configure(function() {
   app.set('port', process.env.PORT || 3000);
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
+  app.set('trust proxy', true);
   app.use(express.favicon(__dirname + '/public/favicon.ico',
           { maxAge: 365 * 24 * 60 * 60 * 1000 }));
   app.use(express.logger('dev'));
@@ -94,6 +97,7 @@ app.get('/pots', onlineTracker, routes.pots);
 
 app.get('/brews/add', ensureAuthenticatedOrKnownIp, routes.brewAdd);
 app.post('/brews/add', ensureAuthenticatedOrKnownIp, routes.brewAddSubmit);
+app.get('/brews/add/simple', ensureAuthenticatedOrKnownIp, routes.brewAddSimple);
 app.get('/brews/:id', onlineTracker, routes.brewDetail);
 app.delete('/brews/:id', userHelper.ensureAuthenticated, routes.brewDelete);
 app.get('/brews', onlineTracker, routes.brews);

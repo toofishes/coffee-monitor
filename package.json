@@ -1,7 +1,7 @@
 {
   "name": "coffee-monitor",
   "description": "Monitor when coffee pots were brewed",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "author": "Dan McGee <dpmcgee@gmail.com>",
   "private": true,
   "bugs": {
@@ -48,5 +48,5 @@
   "engines": {
     "node": ">=0.8"
   },
-  "subdomain": "toofishes.coffee-monitor"
+  "subdomain": "coffee-monitor"
 }
