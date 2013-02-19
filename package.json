@@ -35,11 +35,13 @@
     "express-validator": "0.3.x",
     "jade": "0.28.x",
     "moment": "2.0.x",
+    "oauth": "0.9.8",
     "passport": "0.1.x",
     "passport-local": "0.1.x",
     "redis": "0.8.x",
     "socket.io": "0.9.x",
-    "stylus": "0.32.x"
+    "stylus": "0.32.x",
+    "twit": "1.0.x"
   },
   "devDependencies": {
     "jitsu": "*",
