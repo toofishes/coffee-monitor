@@ -23,6 +23,7 @@ exports.postBrew = function(brew) {
     room.speak('Coffee is brewing in ' + brew.potName + '! It will be ready: ' + niceTime,
       function(err, msg) {
         if (err) throw err;
+        console.log("Message sent to campfire", msg);
       });
   });
 };

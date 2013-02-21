@@ -41,6 +41,7 @@ function ensureAuthenticatedOrKnownIp(req, res, next) {
       blessed_ip === '*' || ip === blessed_ip) {
     return next();
   }
+  console.log("Request from IP not blessed", ip);
   return userHelper.ensureAuthenticated(req, res, next);
 }
 
