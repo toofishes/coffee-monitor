@@ -14,16 +14,18 @@ if (config.account && config.token && config.room) {
 }
 
 exports.postBrew = function(brew) {
+  console.log("Campfire postBrew method called", instance, brew);
   if (!instance) {
     return;
   }
   instance.room(config.room, function(err, room) {
+    console.log("Got campfire room for instance", err, room);
     if (err) throw err;
     var niceTime = moment(parseInt(brew.readyAt)).calendar();
     room.speak('Coffee is brewing in ' + brew.potName + '! It will be ready: ' + niceTime,
       function(err, msg) {
+        console.log("Message sent to campfire?", err, msg);
         if (err) throw err;
-        console.log("Message sent to campfire", msg);
       });
   });
 };
