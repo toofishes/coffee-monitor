@@ -35,14 +35,16 @@ function compressFilter(req, res) {
 }
 
 function ensureAuthenticatedOrKnownIp(req, res, next) {
-  var ip = req.ip,
-      blessed_ip = process.env.BLESSED_IP || "notarealip";
-  if (ip === "127.0.0.1" || ip === "::1" ||
-      blessed_ip === '*' || ip === blessed_ip) {
-    return next();
-  }
-  console.log("Request from IP not blessed", ip);
-  return userHelper.ensureAuthenticated(req, res, next);
+  var ip = req.ip;
+  db.sismember("blessedIps", ip, function(err, result) {
+    if (err) return next(err);
+    if (result) {
+      console.log("Request from IP is blessed", ip);
+      return next();
+    }
+    console.log("Request from IP is NOT blessed", ip);
+    return userHelper.ensureAuthenticated(req, res, next);
+  });
 }
 
 
