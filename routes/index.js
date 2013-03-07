@@ -138,7 +138,7 @@ exports.brewAddSimple = function(req, res) {
     [man.getMakers.bind(man), man.getPots.bind(man)],
     function(err, results) {
       res.render('brew-add-buttons', {
-        'title': 'Add Brew for Pot',
+        'title': 'Add Brew',
         'makers': results[0],
         'pots': results[1]
       });
