@@ -105,6 +105,7 @@ app.delete('/brews/:id', userHelper.ensureAuthenticated, routes.brewDelete);
 app.get('/brews', onlineTracker, routes.brews);
 
 app.get('/tea', onlineTracker, routes.teapot);
+app.get('/qr', onlineTracker, routes.qr);
 
 // Authentication
 app.get('/login', onlineTracker, routes.login);

@@ -206,3 +206,9 @@ exports.teapot = function(req, res) {
   res.set('Content-Type', 'text/plain');
   res.send(418, 'I\'m a teapot');
 }
+
+exports.qr = function(req, res) {
+  res.render('qr', {
+    'title': 'Coffee Monitor',
+  });
+};
