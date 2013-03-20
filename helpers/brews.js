@@ -105,6 +105,10 @@ BrewManager.prototype.getBrew = function(id, next) {
   this.db.hgetall('brew:' + id, next);
 };
 
+function int10(val) {
+  return parseInt(val, 10);
+}
+
 BrewManager.prototype.addBrew = function(brew, next) {
   var self = this;
   async.waterfall([
@@ -120,8 +124,7 @@ BrewManager.prototype.addBrew = function(brew, next) {
         var now = Date.now();
         var makerReady = results[0][2] || 0;
         var potReady = results[1][2] || 0;
-        if (process.env.NODE_ENV === 'production' &&
-			(makerReady > now || potReady > now)) {
+        if (process.env.NODE_ENV === 'production' && (makerReady > now || potReady > now)) {
           next("Not enough time elapsed for brew to make sense!");
           return;
         }
@@ -129,6 +132,21 @@ BrewManager.prototype.addBrew = function(brew, next) {
         brew.brewTime = results[0][1];
         brew.potName = results[1][0];
         brew.potColor = results[1][1];
+
+        // base our created and ready times off what was passed in; only one of
+        // them is required in order to proceed as we can calculate the other
+        if (!brew.createdAt) {
+          if (!brew.readyAt) {
+            brew.createdAt = now;
+          } else {
+            brew.createdAt = brew.readyAt - (1000 * int10(brew.brewTime));
+          }
+        }
+        if (!brew.readyAt) {
+          var ready = int10(brew.createdAt) + (1000 * int10(brew.brewTime));
+          brew.readyAt = ready;
+        }
+
         next(null, brew);
       },
       function(brew, next) {
@@ -136,9 +154,8 @@ BrewManager.prototype.addBrew = function(brew, next) {
       },
       function(result, next) {
         var now = brew.createdAt;
-        var ready = parseInt(now, 10) + (1000 * parseInt(brew.brewTime, 10));
+        var ready = brew.readyAt;
         self.db.multi()
-          .hset('brew:' + brew.id, 'readyAt', ready)
           .zadd('maker:' + brew.makerId + ':brews', now, brew.id)
           .zadd('pot:' + brew.potId + ':brews', now, brew.id)
           .hmset('maker:' + brew.makerId, 'lastBrew', now,

@@ -147,7 +147,8 @@ exports.brewAddSimple = function(req, res) {
 
 exports.brewAddSubmit = function(req, res) {
   req.assert('maker').notEmpty().isInt();
-  req.assert('pot').notEmpty().isInt();
+  // accept either '1' or '1-start' or '1-finish'
+  req.assert('pot').notEmpty().is(/^\d+(-(start|finish))?$/);
 
   var errors = req.validationErrors();
   if(errors) {
@@ -157,13 +158,17 @@ exports.brewAddSubmit = function(req, res) {
   }
 
   var maker = req.sanitize('maker').toInt();
-  var pot = req.sanitize('pot').toInt();
+  var potParts = req.param('pot').split('-');
   var brew = {
     makerId: maker,
-    potId: pot,
+    potId: parseInt(potParts[0], 10),
     creationIp: req.ip,
-    createdAt: Date.now()
   };
+  if (potParts.length > 1 && potParts[1] === 'finish') {
+    brew.readyAt = Date.now();
+  } else {
+    brew.createdAt = Date.now();
+  }
 
   req.manager.addBrew(brew, function(err, brew) {
     if (err) {
