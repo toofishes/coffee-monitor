@@ -15,10 +15,21 @@ exports.updateBrew = function(app, io, manager, brewId) {
   // TODO: there has to be a better way of getting all this darn state
   // and global stuff into here.
   manager.getBrew(brewId, function(error, brew) {
-    app.render('includes/brew-single', {brew: brew}, function(err, html) {
-      io.sockets.emit('updateBrew', html);
-    });
-    campfireHelper.postBrew(brew);
+    async.parallel([
+      function(next) {
+        app.render('includes/brew-single', {brew: brew}, function(err, html) {
+          if (err) {
+            next(err);
+            return;
+          }
+          io.sockets.emit('updateBrew', html);
+          next(null);
+        })
+      },
+      function(next) {
+        campfireHelper.postBrew(brew, next);
+      }
+    ]);
   });
 };
 
